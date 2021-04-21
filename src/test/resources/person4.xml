@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<client>
+    <firstname>Pierino</firstname>
+    <lastname>Arcuri</lastname>
+    <email>phunny@jourrapide.com</email>
+    <birthDate>1988-03-29</birthDate>
+    <employed>true</employed>
+    <position>Chief executive of Bell Markets</position>
+    <passportSeries>MM</passportSeries>
+    <passportNumber>2847H748H49</passportNumber>
+    <phoneNumber>+39-351-2555-7436</phoneNumber>
+    <currentCities>
+        <city>
+            <name>Padua</name>
+        </city>
+        <city>
+            <name>Roma</name>
+        </city>
+    </currentCities>
+    <registrationCities>
+        <city>
+            <name>Florence</name>
+        </city>
+    </registrationCities>
+    <citizenship>
+        <country>
+            <name>Italy</name>
+        </country>
+    </citizenship>
+    <address>Piazza Pilastri, 133</address>
+</client>

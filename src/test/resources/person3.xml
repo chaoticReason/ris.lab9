@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<client>
+    <firstname>Adam</firstname>
+    <lastname>Lxat</lastname>
+    <email>cat.begemot@gmail.com</email>
+    <currentCities>
+        <city>
+            <name>Polotsk</name>
+        </city>
+    </currentCities>
+</client>

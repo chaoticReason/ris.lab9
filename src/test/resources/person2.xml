@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<client>
+    <firstname>Paris</firstname>
+    <lastname>Paris</lastname>
+    <email>paris.twice@gmail.com</email>
+    <currentCities>
+        <city>
+            <name>Paris</name>
+        </city>
+    </currentCities>
+</client>
