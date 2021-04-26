@@ -9,7 +9,7 @@ class ValidationTest {
     void itShouldValidate()
     {
         Validation v = new Validation();
-        assertTrue( v.validateXMLSchema("person.xsd", "person.xml") );
+        assertTrue( v.validateXMLSchema("person.xsd", "person1.xml") );
     }
 
 }

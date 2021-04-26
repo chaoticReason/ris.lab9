@@ -1,36 +1,29 @@
 package com.bsuir.stankevich.lab8.service;
 
-import com.bsuir.stankevich.lab8.entity.City;
 import com.bsuir.stankevich.lab8.entity.Client;
 import com.bsuir.stankevich.lab8.entity.Country;
-import com.bsuir.stankevich.lab8.repo.CityRepository;
 import com.bsuir.stankevich.lab8.repo.ClientRepository;
-import com.bsuir.stankevich.lab8.repo.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static com.bsuir.stankevich.lab8.myutils.Checker.*;
 
-//CRUD operations
 @Service
 public class ClientService {
     private final ClientRepository clientRepository;
-    private final CityRepository cityRepository;
-    private final CountryRepository countryRepository;
+    private final CountryService countryService;
+    private final CityService cityService;
 
     @Autowired
     public ClientService(ClientRepository clientRepository,
-                         CityRepository cityRepository,
-                         CountryRepository countryRepository) {
+                         CityService cityService,
+                         CountryService countryService) {
         this.clientRepository = clientRepository;
-        this.cityRepository = cityRepository;
-        this.countryRepository = countryRepository;
+        this.cityService = cityService;
+        this.countryService = countryService;
     }
 
 
@@ -41,120 +34,96 @@ public class ClientService {
 
     public void addNewClient(Client client) throws IllegalStateException
     {
-        //check email
-        if (!isEmail(client.getEmail()))
-            throw new IllegalStateException("Not proper email");
+        if(!containsData( client.getEmail() ))
+            throw new IllegalStateException("Email is required");
+        if (isEmailTaken( client.getEmail() ))
+            throw new IllegalStateException("Email is taken");
 
-        //check email existence
-        Optional<Client> personOptional = clientRepository.findClientByEmail(client.getEmail());
-        if (personOptional.isPresent())
-            throw new IllegalStateException("Email taken");
-
-        //check correctness of number
-        if(client.getPhoneNumber() != null)
+        if(containsData( client.getPhoneNumber() ))
             if(!isPhoneNumber(client.getPhoneNumber()))
                 throw new IllegalStateException("Not proper phone number");
 
-        //checks current cities
-        Set<City> c_cities = client.getCurrentCities();
-        for (City c :c_cities) {
-            Optional<City> cityOptional = cityRepository.findCityByName(c.getName());
-            if(cityOptional.isPresent()) {
-                City cityDetached = cityOptional.get();
-                if(c.getId() == null)
-                    c.setId(cityDetached.getId());
-                else if(!cityDetached.getId().equals(c.getId()))
-                    throw new IllegalStateException("Not proper id of city " + c.getName());
-            }
-            else{
-                if(c.getId()!=null)
-                    throw new IllegalStateException("Not proper id of city " + c.getName());
-                cityRepository.save(c);
-            }
-        }
-
-        //checks registration cities
-        Set<City> r_cities = client.getRegistrationCities();
-        for (City c :r_cities) {
-            Optional<City> cityOptional = cityRepository.findCityByName(c.getName());
-            if(cityOptional.isPresent()) {
-                City cityDetached = cityOptional.get();
-                if(c.getId() == null)
-                    c.setId(cityDetached.getId());
-                else if(!cityDetached.getId().equals(c.getId()))
-                    throw new IllegalStateException("Not proper id of city " + c.getName());
-            }
-            else{
-                if(c.getId()!=null)
-                    throw new IllegalStateException("Not proper id of city " + c.getName());
-                cityRepository.save(c);
-            }
-        }
-
-        //checks countries
-        Set<Country> countries = client.getCitizenship();
-        for (Country c :countries) {
-            Optional<Country> countryOptional = countryRepository.findCountryByName(c.getName());
-            if(countryOptional.isPresent()) {
-                Country countryDetached = countryOptional.get();
-                if(c.getId() == null)
-                    c.setId(countryDetached.getId());
-                else if(!countryDetached.getId().equals(c.getId()))
-                    throw new IllegalStateException("Not proper id of country " + c.getName());
-            }
-            else{
-                if(c.getId()!=null)
-                    throw new IllegalStateException("Not proper id of country " + c.getName());
-                countryRepository.save(c);
-            }
-        }
+        cityService.checkCities( client.getCurrentCities() );
+        cityService.checkCities( client.getRegistrationCities() );
+        countryService.checkCountries(client.getCitizenship());
 
         clientRepository.save(client);
     }
 
     public void deleteClient(Long clientId){
-        boolean exists = clientRepository.existsById(clientId);
-        if (!exists)
-        {
-            throw new IllegalStateException(
-                    "Client with id " + clientId + " does not exist");
-        }
+        if (!clientRepository.existsById(clientId))
+            throw new IllegalStateException("Client with id " + clientId + " does not exist");
+
         clientRepository.deleteById(clientId);
     }
 
     public void deleteClient(String email){
         Optional<Client> personOptional = clientRepository.findClientByEmail(email);
-        boolean exists = personOptional.isPresent();
-        if (!exists)
-        {
-            throw new IllegalStateException(
-                    "Client with email " + email + " does not exist");
-        }
+        if (personOptional.isEmpty())
+            throw new IllegalStateException("Client with email " + email + " does not exist");
+
         clientRepository.deleteById(personOptional.get().getId());
     }
 
+
     @Transactional
-    public void updateEmail(Long clientId, String email){
-        Client client = clientRepository.findById(clientId)
+    public void updateClient(Long clientId, Client client) throws IllegalStateException{
+        Client oldClient = clientRepository.findById(clientId)
                 .orElseThrow(() -> new IllegalStateException(
                         "Client with id " + clientId + " does not exist"));
 
-        if (email != null
-                && email.length() > 0
-                && !Objects.equals(client.getEmail(), email)) {
-            //check 1
-            Optional<Client> studentOptional = clientRepository.findClientByEmail(email);
-            if (studentOptional.isPresent()) {
+        if(client.equals(oldClient)
+                && client.getCitizenship().equals(oldClient.getCitizenship()))
+            throw new IllegalStateException("Update client (id = "+ clientId +") with no changes");
+
+        if(containsData( client.getEmail() ))
+            if(!client.getEmail().equals(oldClient.getEmail())
+                    && isEmailTaken( client.getEmail() ))
                 throw new IllegalStateException("Email taken");
-            }
-            //set email
-            client.setEmail(email);
+            else
+                oldClient.setEmail(client.getEmail());
+
+        if (containsData( client.getFirstname() ))
+            oldClient.setFirstname(client.getFirstname());
+
+        if(containsData( client.getLastname() ))
+            oldClient.setLastname(client.getLastname());
+
+        if(notNull( client.getAddress() ))
+            oldClient.setAddress(client.getAddress());
+
+        if(notNull( client.getBirthDate() ))
+            oldClient.setBirthDate(client.getBirthDate());
+
+        if(containsData( client.getPhoneNumber() )
+                &&isPhoneNumber(client.getPhoneNumber()))
+            oldClient.setPhoneNumber(client.getPhoneNumber());
+
+        //citizenship
+        Set<Country> countries = client.getCitizenship();
+        countryService.checkCountries(countries);
+        for (Country c :countries) {
+            if(!oldClient.getCitizenship().contains(c))
+                oldClient.addCitizenship(c);
         }
+        oldClient.getCitizenship()
+                .removeIf(c -> (!client.getCitizenship().contains(c)));
+
     }
 
-    public Client getClientById(Long clientId){
+    public Client getClientById(Long clientId) throws IllegalStateException{
         return clientRepository.findById(clientId)
                 .orElseThrow(() -> new IllegalStateException(
                         "Client with id " + clientId + " does not exist"));
+    }
+
+    public Client getClientByEmail(String email) throws IllegalStateException{
+        return clientRepository.findClientByEmail(email)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Client with email " + email + " does not exist"));
+    }
+
+    public boolean isEmailTaken(String email){
+        return clientRepository.findClientByEmail(email).isPresent();
     }
 }

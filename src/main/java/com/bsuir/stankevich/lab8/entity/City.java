@@ -1,25 +1,25 @@
 package com.bsuir.stankevich.lab8.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "city")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class City
 {
     @Id
-    @SequenceGenerator(
-            name = "city_sequence",
-            sequenceName = "city_sequence",
-            allocationSize = 1)
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "city_sequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NaturalId
@@ -30,56 +30,37 @@ public class City
     @ManyToMany(
             fetch = FetchType.LAZY,
             mappedBy = "currentCities")
-    private Set<Client> clientsCurrent = new HashSet<>();
+    private final Set<Client> clientsCurrent = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany(
             fetch = FetchType.LAZY,
             mappedBy = "registrationCities")
-    private Set<Client> clientsRegistration = new HashSet<>();
+    private final Set<Client> clientsRegistration = new HashSet<>();
 
-    public City() {
-    }
-
-    public City(String name) {
+    public City(String name){
         this.name = name;
-    }
-
-    public City(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Set<Client> getClientsRegistration() {
-        return clientsRegistration;
-    }
-
-    public void setClientsRegistration(Set<Client> clientsRegistration) {
-        this.clientsRegistration = clientsRegistration;
     }
 
     public Set<Client> getClientsCurrent() {
         return clientsCurrent;
     }
 
-    public void setClientsCurrent(Set<Client> clients) {
-        this.clientsCurrent = clients;
+    public Set<Client> getClientsRegistration() {
+        return clientsRegistration;
     }
 
-    public Long getId() {
-        return id;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        City city = (City) o;
+        return id.equals(city.id) && name.equals(city.name);
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 
     @Override
@@ -88,18 +69,5 @@ public class City
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        City city = (City) o;
-        return name.equals(city.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
     }
 }

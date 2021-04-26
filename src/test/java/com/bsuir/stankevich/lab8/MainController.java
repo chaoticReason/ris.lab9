@@ -1,4 +1,4 @@
-package com.bsuir.stankevich.lab8.controller;
+package com.bsuir.stankevich.lab8;
 
 import com.bsuir.stankevich.lab8.entity.Client;
 import com.bsuir.stankevich.lab8.parser.Serializer;
@@ -48,8 +48,12 @@ public class MainController {
         clientService.deleteClient(client.getEmail());
     }
 
-    public Client updateEmail(Long id, String newEmail) {
-        clientService.updateEmail(id, newEmail);
+    public Client updateClient(Long id, Client client) {
+        clientService.updateClient(id, client);
+        return clientService.getClientById(id);
+    }
+
+    public Client getClient(Long id) {
         return clientService.getClientById(id);
     }
 

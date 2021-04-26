@@ -1,24 +1,24 @@
 package com.bsuir.stankevich.lab8.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "country")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Country {
     @Id
-    @SequenceGenerator(
-            name = "country_sequence",
-            sequenceName = "country_sequence",
-            allocationSize = 1)
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "country_sequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NaturalId
@@ -29,27 +29,11 @@ public class Country {
     @ManyToMany(
             fetch = FetchType.LAZY,
             mappedBy = "citizenship")
-    private Set<Client> clients = new HashSet<>();
+    private final Set<Client> clients = new HashSet<>();
+    public Set<Client> getClients() { return clients; }
 
-    public Country(String name) {
+    public Country(String name){
         this.name = name;
-    }
-
-    public Country(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Country() {
-
-    }
-
-    @Override
-    public String toString() {
-        return "Country{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
     }
 
     @Override
@@ -62,30 +46,14 @@ public class Country {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(name);
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Client> getClients() {
-        return clients;
-    }
-
-    public void setClients(Set<Client> clients) {
-        this.clients = clients;
+    @Override
+    public String toString() {
+        return "Country{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

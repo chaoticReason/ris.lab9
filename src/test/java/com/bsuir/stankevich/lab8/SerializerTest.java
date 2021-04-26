@@ -19,9 +19,13 @@ class SerializerTest {
     }
 
     @Test
-    public void testWritePersonToXml() throws Exception {
-        Client kate = new Client("Kate","Blanchet", "kityblanch@gmail.com");
-        kate.setBirthDate(LocalDate.now());
+    public void testPersonToJson() throws Exception {
+        Client kate = Client.builder()
+                .firstname("Kate")
+                .lastname("Blanchet")
+                .email("kityblanch@gmail.com")
+                .birthDate(LocalDate.now())
+                .build();
         kate.addCurrentCity(new City("Canberra"));
         String json = md.clientToJson(kate);
         Client who = md.jsonToClient(json);
@@ -29,9 +33,13 @@ class SerializerTest {
     }
 
     @Test
-    public void testWritePersonToJson() throws Exception {
-        Client kate = new Client("Kate","Blanchet", "kityblanch@gmail.com");
-        kate.setBirthDate(LocalDate.now());
+    public void testPersonToXml() throws Exception {
+        Client kate = Client.builder()
+                .firstname("Kate")
+                .lastname("Blanchet")
+                .email("kityblanch@gmail.com")
+                .birthDate(LocalDate.now())
+                .build();
         kate.addCurrentCity(new City("Canberra"));
         String xml = md.clientToXml(kate);
         Client who = md.xmlToClient(xml);
@@ -41,15 +49,23 @@ class SerializerTest {
     @Test
     public void testReadPerson2Xml() throws Exception {
         Client p = md.readXmlClient("person2.xml");
-        Client paris = new Client("Paris","Paris", "paris.twice@gmail.com");
+        Client paris = Client.builder()
+                .firstname("Paris")
+                .lastname("Paris")
+                .email("paris.twice@gmail.com")
+                .build();
         paris.addCurrentCity(new City("Paris"));
         assertEquals(p,paris);
     }
 
     @Test
     public void testReadPersonXml() throws Exception {
-        Client p = md.readXmlClient("person.xml");
-        assertEquals(p, new Client("Roger","Adamson", "tiger233@gmail.com<"));
+        Client p = md.readXmlClient("person1.xml");
+        assertEquals(p, Client.builder()
+                            .firstname("Roger")
+                            .lastname("Adamson")
+                            .email("tiger233@gmail.com")
+                            .build());
     }
 
     @Test

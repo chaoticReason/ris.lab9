@@ -1,5 +1,6 @@
 package com.bsuir.stankevich.lab8.myutils;
 
+import java.time.LocalDate;
 import java.util.regex.Pattern;
 
 public class Checker {
@@ -12,4 +13,7 @@ public class Checker {
     public static Boolean isEmail(String email) {
         return Pattern.matches(EMAIL_REGEX, email);
     }
+    public static Boolean containsData(String str){ return str != null && !str.isEmpty();}
+    public static Boolean notNull(String str){return str != null; }
+    public static Boolean notNull(LocalDate date){return date != null; }
 }
